@@ -1,0 +1,32 @@
+// the clip lambert shader is a lamber shader with clipping capablities
+// we use this shader to render reflection and refraction scenes
+
+#version 330 core
+
+layout (location = 0) in vec3 inPos;
+layout (location = 1) in vec2 inUV;
+layout (location = 2) in vec3 inNormal;
+
+out vec3 pos;
+smooth out vec3 normal;
+out vec2 uv;
+
+uniform mat4 model;
+uniform mat4 view;
+uniform mat4 projection;
+
+uniform vec4 clipPlane;
+
+void main()
+{
+    vec4 position = vec4(inPos, 1.0);
+    vec4 worldPos = model * position;
+
+    gl_ClipDistance[0] = dot(worldPos, clipPlane);
+
+    gl_Position = projection * view * model * position;
+
+    pos = worldPos.xyz;
+    uv = inUV;
+    normal = mat3(transpose(inverse(model))) * inNormal;
+}
